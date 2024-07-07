@@ -1,0 +1,74 @@
+STUDENT MANAGEMENT SYSTEM:
+#################################################   STUDENT MANAGEMENT SYSTEM   ###########################################################
+import tkinter as tk
+from tkinter import messagebox, simpledialog
+import subprocess
+
+class StudentManagementSystem:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Student Management System")
+        self.root.geometry("500x400")
+        
+        self.students = {}
+        
+       
+        self.create_widgets()
+
+    def create_widgets(self):
+        tk.Label(self.root, text="Student Management System", font=("Arial", 20)).pack(pady=10)
+        
+        tk.Button(self.root, text="Add Student", command=self.add_student).pack(pady=5)
+        tk.Button(self.root, text="Update Student", command=self.update_student).pack(pady=5)
+        tk.Button(self.root, text="Delete Student", command=self.delete_student).pack(pady=5)
+        tk.Button(self.root, text="View Students", command=self.view_students).pack(pady=5)
+        tk.Button(self.root, text="Run External Command", command=self.run_external_command).pack(pady=5)
+        
+        self.output_text = tk.Text(self.root, height=10, width=50)
+        self.output_text.pack(pady=10)
+    
+    def add_student(self):
+        student_id = simpledialog.askstring("Input", "Enter Student ID:")
+        student_name = simpledialog.askstring("Input", "Enter Student Name:")
+        if student_id and student_name:
+            self.students[student_id] = student_name
+            messagebox.showinfo("Info", f"Student {student_name} added successfully.")
+    
+    def update_student(self):
+        student_id = simpledialog.askstring("Input", "Enter Student ID:")
+        if student_id in self.students:
+            student_name = simpledialog.askstring("Input", "Enter New Student Name:")
+            self.students[student_id] = student_name
+            messagebox.showinfo("Info", f"Student {student_id} updated successfully.")
+        else:
+            messagebox.showerror("Error", "Student ID not found.")
+    
+    def delete_student(self):
+        student_id = simpledialog.askstring("Input", "Enter Student ID:")
+        if student_id in self.students:
+            del self.students[student_id]
+            messagebox.showinfo("Info", f"Student {student_id} deleted successfully.")
+        else:
+            messagebox.showerror("Error", "Student ID not found.")
+    
+    def view_students(self):
+        self.output_text.delete('1.0', tk.END)
+        for student_id, student_name in self.students.items():
+            self.output_text.insert(tk.END, f"ID: {student_id}, Name: {student_name}\n")
+    
+    def run_external_command(self):
+        command = simpledialog.askstring("Input", "Enter the command to run:")
+        if command:
+            try:
+                result = subprocess.run(command, shell=True, capture_output=True, text=True)
+                self.output_text.delete('1.0', tk.END)
+                self.output_text.insert(tk.END, result.stdout)
+                if result.stderr:
+                    self.output_text.insert(tk.END, f"\nError:\n{result.stderr}")
+            except Exception as e:
+                messagebox.showerror("Error", str(e))
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = StudentManagementSystem(root)
+    root.mainloop()
